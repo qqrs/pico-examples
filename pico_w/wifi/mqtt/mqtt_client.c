@@ -215,7 +215,7 @@ static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t f
 
 static void mqtt_incoming_publish_cb(void *arg, const char *topic, u32_t tot_len) {
     MQTT_CLIENT_DATA_T* state = (MQTT_CLIENT_DATA_T*)arg;
-    strncpy(state->topic, topic, sizeof(state->topic));
+    snprintf(state->topic, sizeof(state->topic), "%s", topic);
 }
 
 static void temperature_worker_fn(async_context_t *context, async_at_time_worker_t *worker) {
