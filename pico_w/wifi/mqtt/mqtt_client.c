@@ -348,9 +348,14 @@ int main(void) {
     static const uint8_t ca_cert[] = TLS_ROOT_CERT;
     static const uint8_t client_key[] = TLS_CLIENT_KEY;
     static const uint8_t client_cert[] = TLS_CLIENT_CERT;
-    // This confirms the indentity of the server and the client
-    state.mqtt_client_info.tls_config = altcp_tls_create_config_client_2wayauth(ca_cert, sizeof(ca_cert),
-            client_key, sizeof(client_key), NULL, 0, client_cert, sizeof(client_cert));
+    if (sizeof(client_key) > 1 && sizeof(client_cert) > 1) {
+        // mTLS - confirm identity of server and client
+        state.mqtt_client_info.tls_config = altcp_tls_create_config_client_2wayauth(ca_cert, sizeof(ca_cert),
+                client_key, sizeof(client_key), NULL, 0, client_cert, sizeof(client_cert));
+    } else {
+        // one-way TLS - only confirm identity of server via root CA cert
+        state.mqtt_client_info.tls_config = altcp_tls_create_config_client(ca_cert, sizeof(ca_cert));
+    }
 #if ALTCP_MBEDTLS_AUTHMODE != MBEDTLS_SSL_VERIFY_REQUIRED
     WARN_printf("Warning: tls without verification is insecure\n");
 #endif
