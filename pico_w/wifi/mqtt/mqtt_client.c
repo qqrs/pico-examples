@@ -92,6 +92,11 @@ typedef struct {
 #define MQTT_UNIQUE_TOPIC 0
 #endif
 
+#if !defined(MQTT_TOPIC_PREFIX) && defined(MQTT_USERNAME)
+#define MQTT_TOPIC_PREFIX 1
+#define MQTT_TOPIC_PREFIX_STR MQTT_USERNAME "/f"
+#endif
+
 /* References for this implementation:
  * raspberry-pi-pico-c-sdk.pdf, Section '4.1.1. hardware_adc'
  * pico-examples/adc/adc_console/adc_console.c */
@@ -122,6 +127,10 @@ static const char *full_topic(MQTT_CLIENT_DATA_T *state, const char *name) {
 #if MQTT_UNIQUE_TOPIC
     static char full_topic[MQTT_TOPIC_LEN];
     snprintf(full_topic, sizeof(full_topic), "/%s%s", state->mqtt_client_info.client_id, name);
+    return full_topic;
+#elif MQTT_TOPIC_PREFIX
+    static char full_topic[MQTT_TOPIC_LEN];
+    snprintf(full_topic, sizeof(full_topic), "%s%s", MQTT_TOPIC_PREFIX_STR, name);
     return full_topic;
 #else
     return name;
@@ -187,6 +196,8 @@ static void mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t f
     MQTT_CLIENT_DATA_T* state = (MQTT_CLIENT_DATA_T*)arg;
 #if MQTT_UNIQUE_TOPIC
     const char *basic_topic = state->topic + strlen(state->mqtt_client_info.client_id) + 1;
+#elif MQTT_TOPIC_PREFIX
+    const char *basic_topic = state->topic + strlen(MQTT_TOPIC_PREFIX_STR);
 #else
     const char *basic_topic = state->topic;
 #endif
