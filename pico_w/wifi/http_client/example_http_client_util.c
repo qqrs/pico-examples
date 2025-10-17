@@ -54,6 +54,8 @@ err_t http_client_receive_print_fn(__unused void *arg, __unused struct altcp_pcb
         char c = (char)pbuf_get_at(p, offset++);
         HTTP_INFOC(c);
     }
+    altcp_recved(conn, p->tot_len);
+    pbuf_free(p);
     return ERR_OK;
 }
 
@@ -71,7 +73,11 @@ static err_t internal_recv_fn(void *arg, struct altcp_pcb *conn, struct pbuf *p,
     assert(arg);
     EXAMPLE_HTTP_REQUEST_T *req = (EXAMPLE_HTTP_REQUEST_T*)arg;
     if (req->recv_fn) {
+        // custom recv_fn must free the pbuf if it returns ERR_OK or ERR_ABRT
         return req->recv_fn(req->callback_arg, conn, p, err);
+    } else {
+        altcp_recved(conn, p->tot_len);
+        pbuf_free(p);
     }
     return ERR_OK;
 }
