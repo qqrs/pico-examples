@@ -35,6 +35,9 @@ int main() {
         0xa4, 0x97, 0x20, 0x0e, 0x04, 0x6d, 0x39, 0xcc, 0xc7, 0x11, \
         0x2c, 0xd0 };
 
+    // wait for system timer to start ticking before running benchmark
+    sleep_us(1);
+
     // check mbedtls hw accelerated speed
     mbedtls_sha256_context ctx;
     mbedtls_sha256_init(&ctx);
