@@ -25,9 +25,9 @@
 
 #ifndef HTTP_DEBUG
 #ifdef NDEBUG
-#define HTTP_DEBUG
+#define HTTP_DEBUG(...)
 #else
-#define HTTP_DEBUG printf
+#define HTTP_DEBUG(...) printf(__VA_ARGS__)
 #endif
 #endif
 
